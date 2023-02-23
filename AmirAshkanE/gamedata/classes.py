@@ -21,8 +21,6 @@ class Player:
     def __repr__(self):
         return self.name
     
-    # def __str__(self):
-    #     return self.name
 
 class Score:
     def __init__(self):
@@ -34,8 +32,5 @@ class Teams:
     def __init__(self,name,members:list,score:Score):
         self.name = name
         self.members = members
-        self.score = score
+        self.score = score.team_score
     
-
-        
-
