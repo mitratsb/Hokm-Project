@@ -21,21 +21,17 @@ class Player:
     def __repr__(self):
         return self.name
     
-    # def __str__(self):
-    #     return self.name
 
-class Score:
-    def __init__(self):
-        self.team_score = 0
-        self.match_score = 0
+# class Score:
+#     def __init__(self):
+#         self.team_score = 0
+#         self.match_score = 0
 
 
 class Teams:
-    def __init__(self,name,members:list,score:Score):
+    def __init__(self,name,members:list):
         self.name = name
         self.members = members
-        self.score = score
+        self.team_score = 0
+        self.match_score = 0
     
-
-        
-
