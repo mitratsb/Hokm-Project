@@ -54,17 +54,27 @@ def choose_hakem(deck,player_list):
     
     return _hakem
 
-def give_hand(deck,player_list):
+def give_hand(deck:list,player,n):
     shuffle(deck)
-    
-    n = 5
-    
-    for player in player_list:
-        for card in deck:
-            i=0
-            while i < n :
-                player.hand.append(card)
-                deck.remove(card)
-                i+=1
-                
+    i=0
+    for card in deck:
+        player.hand.append(card)
+        deck.remove(card)
+        i+=1
+        if i==n:
+            break
             
+def choose_hokm(player):
+    if player.is_player:
+        print(player.hand)
+        suit = input("Choose Hokm suit: ")
+        for card in player.hand:
+            if suit.capitalize() == card[0]:
+                print(f"Hokm is: {card[0]}")
+                break
+        return suit.capitalize()
+    else:
+        i = randint(0, len(player.hand)-1)
+        card = player.hand[i]
+        print(f"Hokm is: {card[0]}")
+        return card[0]

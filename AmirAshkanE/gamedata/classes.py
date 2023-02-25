@@ -22,15 +22,16 @@ class Player:
         return self.name
     
 
-class Score:
-    def __init__(self):
-        self.team_score = 0
-        self.match_score = 0
+# class Score:
+#     def __init__(self):
+#         self.team_score = 0
+#         self.match_score = 0
 
 
 class Teams:
-    def __init__(self,name,members:list,score:Score):
+    def __init__(self,name,members:list):
         self.name = name
         self.members = members
-        self.score = score.team_score
+        self.team_score = 0
+        self.match_score = 0
     
