@@ -39,14 +39,14 @@ hakem = mc.choose_hakem(main_deck, player_list)
 #      Choosing Hokm     #
 ##########################
 
-turn_index = 0
+hakem_index = 0
 
 for player in player_list:
     if player.is_hakem:
-        turn_index = player_list.index(player)
+        hakem_index = player_list.index(player)
         break
 
-
+turn_index = hakem_index
 while True:
     if turn_index > 3:
         turn_index = 0
@@ -56,9 +56,9 @@ while True:
         mc.give_hand(main_deck, player_list[turn_index], 5)
         turn_index += 1
 
-mc.choose_hokm(hakem)
+hokm = mc.choose_hokm(hakem)
 
-
+turn_index = hakem_index
 while main_deck != []:
     if turn_index > 3:
         turn_index = 0
@@ -72,18 +72,30 @@ while main_deck != []:
 #       Begin Game       #
 ##########################
 
-game_score = 7
+game_score = 1
 
 while team_a.match_score < game_score or team_b.match_score < game_score :
-    round_score = 7
+    round_score = 1
+    turn_index = hakem_index
     while team_a.team_score < round_score or team_b.team_score < round_score:
         table = []
+        play_history=[]
+        active_suit = ""
         while len(table) < 4:
-            
-            # Play cards
+            if turn_index > 3:
+                turn_index = 0
+            else:
+                # Play cards
+                mc.play_cards(player_list[turn_index], table, active_suit, play_history)
+                active_suit = table[0][0]
+                print(table)
+                print(play_history)
+                print(active_suit)
+                turn_index += 1
             # Compare cards
+            
             # Determine Winner and add score
             # clear table and continue to next round
+        break
             
-            pass
-    pass
+    break
