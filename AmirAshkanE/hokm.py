@@ -27,7 +27,7 @@ team_a_members,team_b_members = mc.pair_up(player_list)
 
 team_a = cs.Teams("A", team_a_members)
 team_b = cs.Teams("B", team_b_members)
-Teams = [team_a,team_b]
+teams = [team_a,team_b]
 ##########################
 #     Choosing Hakem     #
 ##########################
@@ -47,6 +47,7 @@ for player in player_list:
         break
 
 turn_index = hakem_index
+
 while True:
     if turn_index > 3:
         turn_index = 0
@@ -72,14 +73,15 @@ while main_deck != []:
 #       Begin Game       #
 ##########################
 
-game_score = 1
+game_score = 7
 
-while team_a.match_score < game_score or team_b.match_score < game_score :
-    round_score = 1
+while True :
+    print(player_list)
+    round_score = 3
     turn_index = hakem_index
-    while team_a.team_score < round_score or team_b.team_score < round_score:
+    while True:
         table = []
-        play_history=[]
+        play_history={}
         active_suit = ""
         while len(table) < 4:
             if turn_index > 3:
@@ -88,14 +90,25 @@ while team_a.match_score < game_score or team_b.match_score < game_score :
                 # Play cards
                 mc.play_cards(player_list[turn_index], table, active_suit, play_history)
                 active_suit = table[0][0]
-                print(table)
-                print(play_history)
-                print(active_suit)
                 turn_index += 1
+                print(table)
+        
+        print(play_history)
             # Compare cards
-            
             # Determine Winner and add score
+        winner_player = mc.find_winner(play_history, mc.compare_cards(table, hokm, active_suit))
+        winner_team = mc.find_winner_team(teams, winner_player)
+        turn_index = mc.set_winner_index(winner_player, player_list)
+        mc.give_point_winner(teams, winner_player)
+        print(team_a.team_score,team_b.team_score)
+        
+        if team_a.team_score >= round_score or team_b.team_score >= round_score:
+            break
             # clear table and continue to next round
+    mc.tally_round_score(team_a, team_b, round_score,winner_team)
+    print(player_list)
+    if team_a.match_score >= game_score or team_b.match_score >= game_score:
         break
-            
-    break
+    else:
+        hakem_index,hakem,hokm = mc.begin_new_game(main_deck, winner_player, winner_team, player_list, turn_index, hakem, teams)
+        print(player_list)

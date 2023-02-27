@@ -1,4 +1,5 @@
 from random import randint,shuffle
+from gamedata import classes as cs
 
 
 
@@ -9,12 +10,6 @@ def deck_builder(suit1,suit2,suit3,suit4):
         for s in suit.card_list:
             _deck.append(s)
     return _deck
-
-
-# def shuffle_deck(deck):
-#     shuffle(deck)
-#     return deck
-
 
 def shuffle_players(player_list):
     shuffle(player_list)
@@ -49,7 +44,7 @@ def choose_hakem(deck,player_list):
             else:
                 i += 1
                 _deck.remove(card)
-    
+    print(f"Hakem is {_hakem}")
     return _hakem
 
 def give_hand(deck:list,player,n):
@@ -98,17 +93,17 @@ def play_cards(player,table,active_suit,play_history):
         while not has_chosen:
             print(player.hand)
             c,v = input("Choose a card from your hand(seperate suit and value by space): ").split()
-            drawn_card = [c.capitalize(),int(v)]
+            drawn_card = [card for card in player.hand if c.capitalize() == card[0] and int(v) == card[1]][0]
             if drawn_card not in player.hand:
                 print("You must choose a card from you hand!!")
             else:
                 if active_suit == "":
                     for card in player.hand:
                         if drawn_card == card:
-                            table.append(drawn_card)
-                            player.hand.remove(drawn_card)
+                            table.append(card)
+                            player.hand.remove(card)
                             active_suit = c.capitalize()
-                            play_history.append({player.name : drawn_card})
+                            play_history.update({player.name : card})
                             has_chosen = True
                             break
                 else:
@@ -117,7 +112,7 @@ def play_cards(player,table,active_suit,play_history):
                     else:
                         table.append(drawn_card)
                         player.hand.remove(drawn_card)
-                        play_history.append({player.name : drawn_card})
+                        play_history.update({player.name : drawn_card})
                         has_chosen = True
                         
                             
@@ -126,10 +121,123 @@ def play_cards(player,table,active_suit,play_history):
             drawn_card = player.hand[randint(0, len(player.hand)-1)]
             player.hand.remove(drawn_card)
             table.append(drawn_card)
-            play_history.append({player.name : drawn_card})
+            play_history.update({player.name : drawn_card})
             active_suit = drawn_card[0]
         else:
             drawn_card = find_available_cards(player, active_suit)[randint(0, len(find_available_cards(player, active_suit))-1)]
             player.hand.remove(drawn_card)
             table.append(drawn_card)
-            play_history.append({player.name : drawn_card})
+            play_history.update({player.name : drawn_card})
+
+def compare_cards(table,hokm,active_suit):
+    for card in table:
+        if card[0] == hokm:
+            card[1] += 100
+        elif card[0] != active_suit:
+            card[1] = 0
+    
+    winner_card = table[0]
+    for card in table:
+        if winner_card[1] < card[1]:
+            winner_card = card
+    if winner_card[0] == hokm:
+        winner_card[1] -= 100
+    return winner_card
+
+def find_winner(play_history,winner_player):
+    winner = [k for k,v in play_history.items() if v == winner_player]
+    return winner[0]
+
+def find_winner_team(teams,winner_player):
+    for team in teams:
+        for member in team.members:
+            if winner_player == str(member):
+                return team
+
+def set_winner_index(winner_player,player_list):
+    for player in player_list:
+        if winner_player == player.name:
+            return player_list.index(player)
+
+def give_point_winner(teams,winner_player):
+    for team in teams:
+        for member in team.members:
+            if winner_player == str(member):
+                team.team_score += 1
+
+def tally_round_score(team_a,team_b,round_score,winner_team):
+    if team_a.team_score == round_score and team_b.team_score == 0:
+        team_a.match_score += 2
+        team_a.team_score = 0
+        team_b.team_score = 0
+    elif team_b.team_score == round_score and team_a.team_score == 0:
+        team_b.match_score += 2
+        team_a.team_score = 0
+        team_b.team_score = 0
+    else:
+        winner_team.match_score += 1
+        team_a.team_score = 0
+        team_b.team_score = 0
+
+def begin_new_game(main_deck,winner_player,winner_team,player_list,turn_index,hakem,teams):
+    clubs = cs.Cards("Club")
+    hearts = cs.Cards("Heart")
+    spades = cs.Cards("Spade")
+    diamonds = cs.Cards("Diamond")
+    
+    for player in player_list:
+        player.hand.clear()
+    
+    main_deck = deck_builder(clubs, diamonds, hearts, spades)
+    shuffle(main_deck)
+    
+    hakem_index = player_list.index(hakem)
+
+    for team in teams:
+        if winner_team.members == team.members:
+            for member in team.members:
+                if winner_player == member.name:
+                    hakem_index = player_list.index(hakem)
+                    break
+            
+        else:
+            player_list[hakem_index].is_hakem = False
+            hakem_index = player_list.index(hakem) + 1
+            if hakem_index > 3:
+                hakem_index = 0
+            hakem = player_list[hakem_index]    
+            player_list[hakem_index].is_hakem = True
+            break
+            
+            
+    
+    
+    for player in player_list:
+        if player.is_hakem:
+            hakem_index = player_list.index(player)
+            break
+    
+    turn_index = hakem_index
+    
+    while True:
+        if turn_index > 3:
+            turn_index = 0
+        elif player_list[turn_index].hand != []:
+            break
+        else:    
+            give_hand(main_deck, player_list[turn_index], 5)
+            turn_index += 1
+
+    hokm = choose_hokm(hakem)
+
+    turn_index = hakem_index
+    while main_deck != []:
+        if turn_index > 3:
+            turn_index = 0
+        else:
+            if len(player_list[turn_index].hand)<13:
+                give_hand(main_deck, player_list[turn_index], 8)
+            else:    
+                turn_index += 1
+    print(f"Hakem is : {hakem}")
+    return hakem_index,hakem,hokm
