@@ -64,12 +64,10 @@ class Player:
     def __repr__(self):
         return self.name
 
-my_name= input('Please Enter your name : ')
-
-me = Player(my_name ,True,False,0)
-npc1 = Player("Mahtab" ,False,False,0)
-npc2 = Player("Farhad" ,False,False,0)
-npc3 = Player("Hamed" ,False,False,0)
+me = Player("Mitra",True,False,0)
+npc1 = Player("Mahtab",False,False,0)
+npc2 = Player("Farhad",False,False,0)
+npc3 = Player("Hamed",False,False,0)
 players_list=[me , npc1 , npc2, npc3]
 
 #-----------------------------------------------------------------------------------------
@@ -122,12 +120,12 @@ class Game:
             player.hand.append(random_card)
             Game.sample_db.remove(random_card)
             i+=1
-            if len(player.hand)==5 and player.is_me: #انتهای کد از کامنت در بیاد
-                print(f'Your hand : {player.hand}')
+            # if len(player.hand)==5 and player.is_me: #انتهای کد از کامنت در بیاد
+            #     print(f'Your hand : {player.hand}')
                 
-            # if len(player.hand)==5: #not seen
-            #     player.hand.sort(key=func)
-            #     print(f'{player} : {player.hand}')
+            if len(player.hand)==5: #not seen
+                player.hand.sort(key=func)
+                print(f'{player} : {player.hand}')
                 
             if len(Game.sample_db)==32 :
                 break
@@ -137,7 +135,7 @@ class Game:
     def level_2(cls):
         #تعیین حکم
         cprint(f"\n-------Hokm-------" , "green")
-        # print(f'Hakem hand : {Game.Hakem.hand}') #not seen
+        print(f'Hakem hand : {Game.Hakem.hand}') #not seen
         suits_list= ['♥','♦','♣','♠']
         if Game.Hakem.is_me:
             while True:
@@ -191,13 +189,13 @@ class Game:
             player.hand.append(random_card)
             Game.sample_db.remove(random_card)
             i+=1
-            if len(player.hand)==13 and player.is_me: #انتهای کد از کامنت در بیاد
-                player.hand.sort(key=func)
-                print(f'Your hand : {player.hand}')
-                
-            # if len(player.hand)==13: #not seen
+            # if len(player.hand)==13 and player.is_me: #انتهای کد از کامنت در بیاد
             #     player.hand.sort(key=func)
-            #     print(f'{player} : {player.hand}')
+            #     print(f'Your hand : {player.hand}')
+                
+            if len(player.hand)==13: #not seen
+                player.hand.sort(key=func)
+                print(f'{player} : {player.hand}')
                 
             if len(Game.sample_db)==0 :
                 break
@@ -230,7 +228,7 @@ class Game:
                 
                 players_list_sample= players_list.copy()    
             print(f'Order of play is : {players_order}\n')
-            # print(f'{players_order[0]} : {players_order[0].hand} \n{players_order[1]} : {players_order[1].hand} \n{players_order[2]} : {players_order[2].hand} \n{players_order[3]} : {players_order[3].hand}\n')
+            print(f'{players_order[0]} : {players_order[0].hand} \n{players_order[1]} : {players_order[1].hand} \n{players_order[2]} : {players_order[2].hand} \n{players_order[3]} : {players_order[3].hand}\n')
             print(f'Your hand: {me.hand}\n')
             ground=[]
             
@@ -540,7 +538,7 @@ class Game:
             card_p4=Card(card4[0],card4[1])
             ground.append(card4)
             gone_cards.append(card4)
-            # print(gone_cards)
+            print(gone_cards)
             
             print(f"\n------ Result ------")
         
@@ -586,12 +584,12 @@ class Game:
                     Game.winner= (f'Our Team -> {me} & {npc2}')
                     cprint(f"\n--------♥️♠️♦️♣️-------End of Game-------♥️♠️♦️♣️-------" , "light_red")
                     cprint(f'The Game Winner : {Game.winner}' , "light_green" , attrs=["bold"] )
-                    cprint(f'\nGreat job {me}!\nThanks for playing this game.\nhope to see you again:)\n')
+                    cprint(f'\nGreat job {me}!\nThanks for playing this game.\nhope to see you again:)')
                     break
                 elif Player.opp_team_handwins >= 3:
                     Game.winner= (f'Opponent Team -> {npc1} & {npc3}')
                     cprint(f"\n--------♥️♠️♦️♣️-------End of Game-------♥️♠️♦️♣️-------" , "light_red")
-                    cprint(f'The Game Winner : {Game.winner}\n' , "light_green" , attrs=["bold"])
+                    cprint(f'The Game Winner : {Game.winner}' , "light_green" , attrs=["bold"])
                     break
                 
                 Player.our_team_score , Player.opp_team_score = 0, 0
@@ -633,12 +631,12 @@ class Game:
                     Game.winner= (f'Our Team -> {me} & {npc2}')
                     cprint(f"\n--------♥️♠️♦️♣️-------End of Game-------♥️♠️♦️♣️-------" , "light_red")
                     cprint(f'The Game Winner : {Game.winner}' , "light_green" , attrs=["bold"] )
-                    cprint(f'\nGreat job {me}!\nThanks for playing this game.\nhope to see you again:)\n')
+                    cprint(f'\nGreat job {me}!\nThanks for playing this game.\nhope to see you again:)')
                     break
                 elif Player.opp_team_handwins >= 3:
                     Game.winner= (f'Opponent Team -> {npc1} & {npc3}')
                     cprint(f"\n--------♥️♠️♦️♣️-------End of Game-------♥️♠️♦️♣️-------" , "light_red")
-                    cprint(f'The Game Winner : {Game.winner}\n' , "light_green")
+                    cprint(f'The Game Winner : {Game.winner}' , "light_green")
                     break
                 
                 Player.our_team_score , Player.opp_team_score = 0, 0
@@ -659,10 +657,11 @@ class Game:
                 Game.level_3() #پخش کل کارت ها
                 
 
-cprint(f'\n"Good day {my_name}. Welcome to Hokm Game." (Designed by mitratsb)' , "light_cyan" , attrs=["underline"])
+cprint(f'\n"Welcome to Hokm Game." (Designed by mitratsb)' , "light_cyan" , attrs=["underline"])
 print('Pay attention please, in order to input a card in any level, you must type a suit shape and value with space.')
 print(f'Keyboard suit shapes -> (♥ : ctrl+3) (♦ : ctrl+4) (♣ : ctrl+5) (♠ : ctrl+6)\n')
-
+# my_name= input('Please Enter your name : ')
+# print("Let's start!")
 
 Game.level_0()
 Game.level_1()
