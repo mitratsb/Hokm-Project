@@ -1,6 +1,6 @@
 #mitratsb
 from random import choice,randint
-from termcolor import cprint,colored
+from termcolor import cprint
 
 x={"♥":[2,3,4,5,6,7,8,9,10,11,12,13,14],
            "♠":[2,3,4,5,6,7,8,9,10,11,12,13,14],
@@ -11,6 +11,54 @@ for key,value in x.items():
     for v in value:
         all_cards.append([key,v])
 
+
+def faced_hand(hand:list):
+    list1=[]
+    for card in hand:
+        if card[1]==11:
+            card=[card[0],"J"]
+            list1.append(card)
+        elif card[1]==12:
+            card=[card[0],"Q"]
+            list1.append(card)
+        elif card[1]==13:
+            card=[card[0],"K"]
+            list1.append(card)
+        elif card[1]==14:
+            card=[card[0],"Ace"]
+            list1.append(card)
+        else:
+            list1.append(card)
+    return list1
+
+def faced_card(card:list):
+    new_card=[]
+    if card[1]==11:
+        new_card=[card[0],"J"]
+    elif card[1]==12:
+        new_card=[card[0],"Q"]
+    elif card[1]==13:
+        new_card=[card[0],"K"]
+    elif card[1]==14:
+        new_card=[card[0],"Ace"]
+    else:
+        new_card=card
+    return new_card
+    
+def to_value(faced_value:str):
+    new_value=0
+    if faced_value=="Ace":
+        new_value=14
+    elif faced_value=="K":
+        new_value=13
+    elif faced_value=="Q":
+        new_value=12
+    elif faced_value=="J":
+        new_value=11
+    else:
+        new_value=faced_value
+    return int(new_value)
+    
 def func(x):
     return x[0],x[1]
 #-----------------------------------------------------------------------------------------
@@ -54,20 +102,20 @@ class Player:
     our_team_handwins=0
     opp_team_handwins=0
     
-    def __init__(self, name, is_me, is_hakem, wins):
+    def __init__(self, name, is_me):
         self.name=name
         self.is_me=is_me
-        self.is_hakem=is_hakem
-        self.wins=wins
         self.hand=[]
     
     def __repr__(self):
         return self.name
 
-me = Player("Mitra",True,False,0)
-npc1 = Player("Mahtab",False,False,0)
-npc2 = Player("Farhad",False,False,0)
-npc3 = Player("Hamed",False,False,0)
+my_name= "Mitra"
+
+me = Player(my_name ,True)
+npc1 = Player("Mahtab" ,False)
+npc2 = Player("Farhad" ,False)
+npc3 = Player("Hamed" ,False)
 players_list=[me , npc1 , npc2, npc3]
 
 #-----------------------------------------------------------------------------------------
@@ -93,7 +141,6 @@ class Game:
             Game.sample_db.remove(random_card)
             if random_card[1]==14:
                 player = players_list[i]
-                player.is_hakem = True
                 Game.Hakem = player
                 break
             else:
@@ -121,11 +168,12 @@ class Game:
             Game.sample_db.remove(random_card)
             i+=1
             # if len(player.hand)==5 and player.is_me: #انتهای کد از کامنت در بیاد
-            #     print(f'Your hand : {player.hand}')
+            #     player.hand.sort(key=func)
+            #     print("Your hand:", *faced_hand(player.hand))
                 
-            if len(player.hand)==5: #not seen
+            if len(player.hand)==5 and player==Game.Hakem: #not seen
                 player.hand.sort(key=func)
-                print(f'{player} : {player.hand}')
+                print(player , ":" ,*faced_hand(player.hand))
                 
             if len(Game.sample_db)==32 :
                 break
@@ -135,7 +183,7 @@ class Game:
     def level_2(cls):
         #تعیین حکم
         cprint(f"\n-------Hokm-------" , "green")
-        print(f'Hakem hand : {Game.Hakem.hand}') #not seen
+        # print(f'Hakem hand : {Game.Hakem.hand}') #not seen
         suits_list= ['♥','♦','♣','♠']
         if Game.Hakem.is_me:
             while True:
@@ -179,7 +227,7 @@ class Game:
     @classmethod
     def level_3(cls):
         #پخش بقیه کارت ها. به هر نفر 8 تا
-        cprint(f"\n---Full Card Distribution---" , "green")
+        # cprint(f"\n---Full Card Distribution---" , "green")
         i=players_list.index(Game.Hakem)
         while True :
             if i==4:
@@ -188,15 +236,7 @@ class Game:
             random_card= Game.sample_db[randint(0,len(Game.sample_db)-1)]
             player.hand.append(random_card)
             Game.sample_db.remove(random_card)
-            i+=1
-            # if len(player.hand)==13 and player.is_me: #انتهای کد از کامنت در بیاد
-            #     player.hand.sort(key=func)
-            #     print(f'Your hand : {player.hand}')
-                
-            if len(player.hand)==13: #not seen
-                player.hand.sort(key=func)
-                print(f'{player} : {player.hand}')
-                
+            i+=1    
             if len(Game.sample_db)==0 :
                 break
         
@@ -227,20 +267,24 @@ class Game:
                         break
                 
                 players_list_sample= players_list.copy()    
-            print(f'Order of play is : {players_order}\n')
-            print(f'{players_order[0]} : {players_order[0].hand} \n{players_order[1]} : {players_order[1].hand} \n{players_order[2]} : {players_order[2].hand} \n{players_order[3]} : {players_order[3].hand}\n')
-            print(f'Your hand: {me.hand}\n')
+            print("Order of play is :", players_order[0],"->",players_order[1],"->",players_order[2],"->",players_order[3],f'\n')   
+            me.hand.sort(key=func)
+            
+            print(players_order[0], *faced_hand(players_order[0].hand))
+            print(players_order[1], *faced_hand(players_order[1].hand))
+            print(players_order[2], *faced_hand(players_order[2].hand))
+            print(players_order[3], *faced_hand(players_order[3].hand), f'\n')
+            print("Your hand:", *faced_hand(me.hand), f"\n")
             ground=[]
-            
-            
             
             
             #play card1 by player1 (Hakem)
             current_player = players_order[0]
             if current_player.is_me :
                 while True:
-                    Game.active_suit , value = input(f"{me} : ").split()
-                    card1 = [Game.active_suit,int(value)]
+                    Game.active_suit , faced_value = input(f"{me} : ").split()
+                    value= to_value(faced_value)
+                    card1 = [Game.active_suit, value]
                     if card1 in me.hand:
                         me.hand.remove(card1)
                         break
@@ -258,7 +302,7 @@ class Game:
                     
                 current_player.hand.remove(card1)
                 Game.active_suit = card1[0]
-                print(current_player , ":" , *card1)
+                print(current_player , ":" , *faced_card(card1))
                 
             card_p1=Card(card1[0],card1[1])
             ground.append(card1)
@@ -277,8 +321,9 @@ class Game:
             
             if current_player.is_me :
                 while True:
-                    suit , value = input(f"{me} : ").split()
-                    card2 = [suit,int(value)]
+                    suit , faced_value = input(f"{me} : ").split()
+                    value= to_value(faced_value)
+                    card2 = [suit, value]
                     #اگر خال اکتیو داری و کارت دیگه ای آوردی
                     if len(c_actives)!=0 and (card2 in me.hand) and (card2 not in c_actives):
                         print('Your card must be an active suit. input again.')
@@ -312,7 +357,7 @@ class Game:
                         card2= min_card
                 
                 current_player.hand.remove(card2)
-                print(current_player , ":" , *card2)
+                print(current_player , ":" , *faced_card(card2))
             card_p2=Card(card2[0],card2[1])
             ground.append(card2)
             gone_cards.append(card2)
@@ -329,8 +374,9 @@ class Game:
             
             if current_player.is_me :
                 while True:
-                    suit , value = input(f"{me} : ").split()
-                    card3 = [suit,int(value)]
+                    suit , faced_value = input(f"{me} : ").split()
+                    value= to_value(faced_value)
+                    card3 = [suit, value]
                     #اگر خال اکتیو داری و کارت دیگه ای آوردی
                     if len(c_actives)!=0 and (card3 in me.hand) and (card3 not in c_actives):
                         print('Your card must be an active suit. input again.')
@@ -415,7 +461,7 @@ class Game:
                                 card3= min_card
                             
                 current_player.hand.remove(card3)
-                print(current_player , ":" , *card3)
+                print(current_player , ":" , *faced_card(card3))
             card_p3=Card(card3[0],card3[1])
             ground.append(card3)
             gone_cards.append(card3)
@@ -432,8 +478,9 @@ class Game:
             
             if current_player.is_me :
                 while True:
-                    suit , value = input(f"{me} : ").split()
-                    card4 = [suit,int(value)]
+                    suit , faced_value = input(f"{me} : ").split()
+                    value= to_value(faced_value)
+                    card4 = [suit, value]
                     #اگر خال اکتیو داری و کارت دیگه ای آوردی
                     if len(c_actives)!=0 and (card4 in me.hand) and (card4 not in c_actives):
                         print('Your card must be an active suit. input again.')
@@ -534,11 +581,11 @@ class Game:
                                     card4= min_card
                      
                 current_player.hand.remove(card4)
-                print(current_player , ":" , *card4)
+                print(current_player , ":" , *faced_card(card4))
             card_p4=Card(card4[0],card4[1])
             ground.append(card4)
             gone_cards.append(card4)
-            print(gone_cards)
+            # print(gone_cards)
             
             print(f"\n------ Result ------")
         
@@ -565,7 +612,7 @@ class Game:
             
             
             #امتیاز یک دست
-            if Player.our_team_score == 2:
+            if Player.our_team_score == 3:
                 if Player.opp_team_score == 0 and (me==Game.Hakem or npc2==Game.Hakem):
                     #تیم مقابل کت شده
                     Player.our_team_handwins += 3
@@ -584,12 +631,12 @@ class Game:
                     Game.winner= (f'Our Team -> {me} & {npc2}')
                     cprint(f"\n--------♥️♠️♦️♣️-------End of Game-------♥️♠️♦️♣️-------" , "light_red")
                     cprint(f'The Game Winner : {Game.winner}' , "light_green" , attrs=["bold"] )
-                    cprint(f'\nGreat job {me}!\nThanks for playing this game.\nhope to see you again:)')
+                    cprint(f'\nGreat job {me}!\nThanks for playing this game.\nhope to see you again:)\n')
                     break
                 elif Player.opp_team_handwins >= 3:
                     Game.winner= (f'Opponent Team -> {npc1} & {npc3}')
                     cprint(f"\n--------♥️♠️♦️♣️-------End of Game-------♥️♠️♦️♣️-------" , "light_red")
-                    cprint(f'The Game Winner : {Game.winner}' , "light_green" , attrs=["bold"])
+                    cprint(f'The Game Winner : {Game.winner}\n' , "light_green" , attrs=["bold"])
                     break
                 
                 Player.our_team_score , Player.opp_team_score = 0, 0
@@ -612,7 +659,7 @@ class Game:
                 Game.level_3() #پخش کل کارت ها
                 
                 
-            elif Player.opp_team_score == 2:
+            elif Player.opp_team_score == 3:
                 if Player.our_team_score == 0 and (npc1==Game.Hakem or npc3==Game.Hakem):
                     #تیم مقابل کت شده
                     Player.opp_team_handwins += 3
@@ -631,12 +678,12 @@ class Game:
                     Game.winner= (f'Our Team -> {me} & {npc2}')
                     cprint(f"\n--------♥️♠️♦️♣️-------End of Game-------♥️♠️♦️♣️-------" , "light_red")
                     cprint(f'The Game Winner : {Game.winner}' , "light_green" , attrs=["bold"] )
-                    cprint(f'\nGreat job {me}!\nThanks for playing this game.\nhope to see you again:)')
+                    cprint(f'\nGreat job {me}!\nThanks for playing this game.\nhope to see you again:)\n')
                     break
                 elif Player.opp_team_handwins >= 3:
                     Game.winner= (f'Opponent Team -> {npc1} & {npc3}')
                     cprint(f"\n--------♥️♠️♦️♣️-------End of Game-------♥️♠️♦️♣️-------" , "light_red")
-                    cprint(f'The Game Winner : {Game.winner}' , "light_green")
+                    cprint(f'The Game Winner : {Game.winner}\n' , "light_green")
                     break
                 
                 Player.our_team_score , Player.opp_team_score = 0, 0
@@ -657,11 +704,10 @@ class Game:
                 Game.level_3() #پخش کل کارت ها
                 
 
-cprint(f'\n"Welcome to Hokm Game." (Designed by mitratsb)' , "light_cyan" , attrs=["underline"])
+cprint(f'\n"Good day {my_name}. Welcome to Hokm Game." (Designed by mitratsb)' , "light_cyan" , attrs=["bold"])
 print('Pay attention please, in order to input a card in any level, you must type a suit shape and value with space.')
 print(f'Keyboard suit shapes -> (♥ : ctrl+3) (♦ : ctrl+4) (♣ : ctrl+5) (♠ : ctrl+6)\n')
-# my_name= input('Please Enter your name : ')
-# print("Let's start!")
+
 
 Game.level_0()
 Game.level_1()
