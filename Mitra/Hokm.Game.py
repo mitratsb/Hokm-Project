@@ -89,7 +89,7 @@ class Card:
             elif  self.suit != Game.active_suit and other.suit == Game.active_suit:
                 return False
             elif  self.suit != Game.active_suit and other.suit != Game.active_suit:
-                return True
+                return True if self.value > other.value else False
 
 #-----------------------------------------------------------------------------------------
 class Player:
@@ -109,13 +109,22 @@ class Player:
     def __repr__(self):
         return self.name
 
-#اسامی ثابت
+#اسامی متغیر و رندوم
+# my_name= input("Hello, Enter your name please: ")
 my_name= "Mitra"
 
+names= ["Mohammad","Sara","Delaram","Ali","Iman","Negar","Kimia","Peyman","Leila","Farhad","Hamed","Shabnam","Saeed","Mahtab"]
+name1= choice(names)
+names.remove(name1)
+name2= choice(names)
+names.remove(name2)
+name3= choice(names)
+names.remove(name3)
+
 me = Player(my_name ,True)
-npc1 = Player("Mahtab" ,False)
-npc2 = Player("Farhad" ,False)
-npc3 = Player("Hamed" ,False)
+npc1 = Player(name1 ,False)
+npc2 = Player(name2 ,False)
+npc3 = Player(name3 ,False)
 players_list=[me , npc1 , npc2, npc3]
 
 #-----------------------------------------------------------------------------------------
@@ -166,22 +175,27 @@ class Game:
             player.hand.append(random_card)
             Game.sample_db.remove(random_card)
             i+=1
-            # if len(player.hand)==5 and player.is_me: #انتهای کد از کامنت در بیاد
+            
+            # #نمیخواهیم دست ها را ببینیم
+            # if len(player.hand)==5 and player.is_me: 
             #     player.hand.sort(key=func)
             #     print("Your hand:", *faced_hand(player.hand))
                 
-            if len(player.hand)==5 and player==Game.Hakem: #not seen
+            #میخواهیم دست ها را ببینیم
+            if len(player.hand)==5 and player==Game.Hakem: 
                 player.hand.sort(key=func)
                 print(player , ":" ,*faced_hand(player.hand))
                 
+                
+                
             if len(Game.sample_db)==32 :
                 break
+        
         
     @classmethod
     def level_2(cls):
         #تعیین حکم
         cprint(f"\n-------Hokm-------" , "green")
-        # print(f'Hakem hand : {Game.Hakem.hand}') #not seen
         suits_list= ['♥','♦','♣','♠']
         if Game.Hakem.is_me:
             while True:
@@ -224,7 +238,6 @@ class Game:
     @classmethod
     def level_3(cls):
         #پخش بقیه کارت ها. به هر نفر 8 تا
-        # cprint(f"\n---Full Card Distribution---" , "green")
         i=players_list.index(Game.Hakem)
         while True :
             if i==4:
@@ -268,16 +281,21 @@ class Game:
                         break
                 
                 players_list_sample= players_list.copy()    
-            print("Order of play is :", players_order[0],"->",players_order[1],"->",players_order[2],"->",players_order[3],f'\n')   
-            players_order[0].hand.sort(key=func)
-            players_order[1].hand.sort(key=func)
-            players_order[2].hand.sort(key=func)
-            players_order[3].hand.sort(key=func)
-            print(players_order[0], *faced_hand(players_order[0].hand))
-            print(players_order[1], *faced_hand(players_order[1].hand))
-            print(players_order[2], *faced_hand(players_order[2].hand))
-            print(players_order[3], *faced_hand(players_order[3].hand), f'\n')
-            print("Your hand:", *faced_hand(me.hand), f"\n")
+            print("Order of play is :", players_order[0],"->",players_order[1],"->",players_order[2],"->",players_order[3],f'\n')
+            
+            
+            #میخواهیم دست ها را ببینیم   
+            for p in players_order:
+                if p.is_me==False:
+                    p.hand.sort(key=func)
+                    print(p , ":" , *faced_hand(p.hand))            
+            me.hand.sort(key=func)
+            print(f"\nYour hand:", *faced_hand(me.hand), f"\n")
+            
+            # #نمیخواهیم دست ها را ببینیم
+            # me.hand.sort(key=func)
+            # print("Your hand:", *faced_hand(me.hand), f"\n")
+            
             
             ground=[]
             card_objects=[]
@@ -346,18 +364,30 @@ class Game:
                         def smart(partner_card , my_hand , gone_cards):
                             suit=partner_card[0]
                             value=partner_card[1]
+                            lists = my_hand + gone_cards
                             if value==14 :
                                 return True
-                            elif value==13 and ([suit,14] in my_hand or gone_cards):
+                            elif value==13 and [suit,14] in lists:
                                 return True
-                            elif value==12 and (([suit,13]and[suit,14]) in my_hand or gone_cards) or ([suit,13] in my_hand and [suit,14] in gone_cards) or ([suit,14] in my_hand and [suit,13] in gone_cards):
+                            elif value==12 and ([suit,13]and[suit,14]) in lists:
                                 return True
+                            elif value==11 and ([suit,12]and[suit,13]and[suit,14]) in lists:
+                                return True
+                            elif value==10 and ([suit,11]and[suit,12]and[suit,13]and[suit,14]) in lists:
+                                return True
+                            elif value==9 and ([suit,10]and[suit,11]and[suit,12]and[suit,13]and[suit,14]) in lists:
+                                return True
+                            elif value==8 and ([suit,9]and[suit,10]and[suit,11]and[suit,12]and[suit,13]and[suit,14]) in lists:
+                                return True
+                            elif value==7 and ([suit,8]and[suit,9]and[suit,10]and[suit,11]and[suit,12]and[suit,13]and[suit,14]) in lists:
+                                return True
+                            else:
+                                return False
                         
-                        #دو حالت خاص
+                        #چند حالت خاص
                         #یارت تک مجاز آورده. پایین ترین خال مجازت رو بیار
-                        #یارت شاه اورده و تک اون خال دست توعه یا بازی شده. پایین ترین خال مجازت رو بیار
-                        
-                        if card_p1 > card_p2 and smart(ground[0] , current_player.hand, gone_cards):
+                        #یارت کارتی آورده که بالاترش یا دست توعه یا بازی شده. پایین ترین خال مجازت رو بیار
+                        if card_p1 > card_p2 and smart(ground[0] , current_player.hand, gone_cards)==True :
                             if len(c_actives)!=0:
                                 card= min_active_card
                             else:
@@ -369,8 +399,28 @@ class Game:
                                     card= min_hokm_card
                             
                         else:
+                            if card_p2 > card_p1 and ground[1][0]==Game.Hokm:
+                                #بازیکن دوم بریده. خال مجاز کم بنداز
+                                if len(c_actives)!=0:
+                                    card= min_active_card
+                                else:
+                                    #مجاز نداری. حکم بالاتر از بازیکن دوم بیار
+                                    c_hokms_higher=[c for c in c_hokms if c[1]>ground[1][1]]
+                                    c_hokms_higher_v=[c[1] for c in c_hokms_higher]
+                                    if len(c_hokms_higher)!=0:
+                                        #حکم بالاتر از بازیکن دوم داریم. کمترینش رو میاریم
+                                        min_card=[c for c in c_hokms_higher if c[1]==min(c_hokms_higher_v)][0]
+                                        card= min_card
+                                    else:
+                                        #حکم پایین تر داری و نمیخواد. پایین رد کن
+                                        if len(c_rads)!=0:
+                                            card= min_rad_card
+                                        else:
+                                            #فقط حکم پایین تر داری. کمترینش رو بیار
+                                            card= min_hokm_card
+                                    
                             #بالاترین خال مجازت رو بیار
-                            if len(c_actives)!=0:
+                            elif len(c_actives)!=0:
                                 if max_active_card[1] > ground[0][1] and max_active_card[1] > ground[1][1]:
                                     #خال مجاز بالاتر از بازیکن اول و دوم داری. بیارش
                                     card= max_active_card
@@ -403,7 +453,7 @@ class Game:
                                         card= min_rad_card
                     
                     if player_number==4:
-                        if card_p2 > card_p1 and card_p3:
+                        if card_p2 > (card_p1 and card_p3):
                             #یارت کارتش بالاست. خال اکتیو پایین بیار
                             if len(c_actives)!=0:
                                 card= min_active_card
@@ -431,18 +481,19 @@ class Game:
                                         if len(c_actives)!=0:
                                             card= min_active_card
                                         else:
-                                            #خال مجاز نداری. پایین رد کن
-                                            if len(c_rads)!=0:
-                                                card= min_rad_card
-                                            else:
-                                                #فقط حکم داری. پایین بنداز
+                                            #خال مجاز نداری. باید حریفت رو ببری. با حکم پایین ببر
+                                            if len(c_hokms)!=0:
                                                 card= min_hokm_card
+                                            else:
+                                                #حکم هم نداری. پایین رد کن
+                                                card= min_rad_card
                                 
                                 elif ground[2][0]==Game.Hokm:   
                                     if len(c_actives)!=0:
+                                        #خال مجاز داری. پایین بنداز
                                         card= min_active_card   
                                     else:
-                                        c_hokms_higher=[c for c in c_hokms if card[1]>ground[2][1]]
+                                        c_hokms_higher=[c for c in c_hokms if c[1]>ground[2][1]]
                                         c_hokms_higher_v=[c[1] for c in c_hokms_higher]
                                         if len(c_hokms_higher)!=0:
                                             #حکم بالاتر از بازیکن سوم داریم. کمترینش رو میاریم
@@ -517,11 +568,13 @@ class Game:
             else:
                 #امتیاز زمین برای تیم حریف
                 Player.opp_team_score += 1
-            print(f'Our team score : {Player.our_team_score} \nOpp team score : {Player.opp_team_score}')
+            cprint(f'Our team score : {Player.our_team_score}' , "green")
+            cprint(f'Opp team score : {Player.opp_team_score}' , "red")
             
             
             #امتیاز یک دست
-            if Player.our_team_score == 3:
+            if Player.our_team_score == 7:
+            # if Player.our_team_score == 3:
                 if Player.opp_team_score == 0 and (me==Game.Hakem or npc2==Game.Hakem):
                     #تیم مقابل کت شده
                     Player.our_team_handwins += 3
@@ -532,17 +585,19 @@ class Game:
                     #کت نشده و حالت عادیه
                     Player.our_team_handwins += 1
     
-                cprint(f'\nOur team hand wins : {Player.our_team_handwins}' , attrs=["bold"])
-                cprint(f'Opp team hand wins : {Player.opp_team_handwins}' , attrs=["bold"])
+                cprint(f'\nOur team hand wins : {Player.our_team_handwins}' , "green" , attrs=["bold"])
+                cprint(f'Opp team hand wins : {Player.opp_team_handwins}' , "red" , attrs=["bold"])
                 
                 #امتیاز کل بازی
-                if Player.our_team_handwins >= 3:
+                if Player.our_team_handwins >= 7:
+                # if Player.our_team_handwins >= 3:
                     Game.winner= (f'Our Team -> {me} & {npc2}')
                     cprint(f"\n--------♥️♠️♦️♣️-------End of Game-------♥️♠️♦️♣️-------" , "light_red")
                     cprint(f'The Game Winner : {Game.winner}' , "light_green" , attrs=["bold"] )
                     cprint(f'\nGreat job {me}!\nThanks for playing this game.\nhope to see you again:)\n')
                     break
-                elif Player.opp_team_handwins >= 3:
+                elif Player.opp_team_handwins >= 7:
+                # elif Player.opp_team_handwins >= 3:
                     Game.winner= (f'Opponent Team -> {npc1} & {npc3}')
                     cprint(f"\n--------♥️♠️♦️♣️-------End of Game-------♥️♠️♦️♣️-------" , "light_red")
                     cprint(f'The Game Winner : {Game.winner}\n' , "light_green" , attrs=["bold"])
@@ -568,7 +623,8 @@ class Game:
                 Game.level_3() #پخش کل کارت ها
                 
                 
-            elif Player.opp_team_score == 3:
+            elif Player.opp_team_score == 7:
+            # if Player.opp_team_score == 3:
                 if Player.our_team_score == 0 and (npc1==Game.Hakem or npc3==Game.Hakem):
                     #تیم مقابل کت شده
                     Player.opp_team_handwins += 3
@@ -579,17 +635,19 @@ class Game:
                     #کت نشده و حالت عادیه
                     Player.opp_team_handwins += 1
                     
-                cprint(f'\nOur team hand wins : {Player.our_team_handwins}' , attrs=["bold"])
-                cprint(f'Opp team hand wins : {Player.opp_team_handwins}', attrs=["bold"])
+                cprint(f'\nOur team hand wins : {Player.our_team_handwins}' , "green" , attrs=["bold"])
+                cprint(f'Opp team hand wins : {Player.opp_team_handwins}', "red" , attrs=["bold"])
                 
                 #امتیاز کل بازی
-                if Player.our_team_handwins >= 3:
+                if Player.our_team_handwins >= 7:
+                # if Player.our_team_handwins >= 3:
                     Game.winner= (f'Our Team -> {me} & {npc2}')
                     cprint(f"\n--------♥️♠️♦️♣️-------End of Game-------♥️♠️♦️♣️-------" , "light_red")
                     cprint(f'The Game Winner : {Game.winner}' , "light_green" , attrs=["bold"] )
                     cprint(f'\nGreat job {me}!\nThanks for playing this game.\nhope to see you again:)\n')
                     break
-                elif Player.opp_team_handwins >= 3:
+                elif Player.opp_team_handwins >= 7:
+                # elif Player.opp_team_handwins >= 3:
                     Game.winner= (f'Opponent Team -> {npc1} & {npc3}')
                     cprint(f"\n--------♥️♠️♦️♣️-------End of Game-------♥️♠️♦️♣️-------" , "light_red")
                     cprint(f'The Game Winner : {Game.winner}\n' , "light_green")
@@ -621,9 +679,3 @@ Game.level_1()
 Game.level_2()
 Game.level_3()
 Game.level_4()
-
-#این یک فایل تست برنامه است
-#هر دست 3 زمین و بردن بازی هم فقط 3 دست احتیاج دارد تا بتوانیم به سرعت به آخر بازی برسیم
-#در این فایل دست بازیکنان مشخص است که بتوانیم هوشمندانه انتخاب کردن کارت ها را توسط آنها ببینیم
-#در این بازی نام بازیکنان ثابت است
-#به غیر از این سه مورد تفارت دیگری با فایل اصلی بازی ندارد
